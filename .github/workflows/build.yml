@@ -9,7 +9,8 @@ on:
 jobs:
   build:
     env:
-      PREFIX: /tmp/openssl
+      INSTALL_PREFIX: /tmp/openssl
+      OPENSLL_ARTIFACT_PATH: /openssl.tar.xz
     permissions: write-all
     runs-on: ubuntu-latest
     container: ghcr.io/all-space-matei/cmake-build
@@ -24,25 +25,32 @@ jobs:
         run: >-
             ./Configure linux-aarch64
             threads
-            --cross-compile-prefix=/usr/local/tools/ARM/a53/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-
-            --prefix=${{ env.PREFIX }}
-            --openssldir=/usr/local/lib/ARM/a53/openssl
+            --cross-compile-prefix=${{ env.CROSS_COMPILE_PREFIX }}
+            --prefix=${{ env.INSTALL_PREFIX }}
+            --openssldir=${{ env.OPENSSLDIR }}
+        env:
+          CROSS_COMPILE_PREFIX: /usr/local/tools/ARM/a53/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-
+          OPENSSLDIR: /usr/local/lib/ARM/a53/openssl
 
       - name: Build
         run: make -j $(nproc)
 
       - name: Install
-        run: make install
+        run: make install_sw # 'install_sw' doesn't include doc, unlike 'install'
+
+      - name: Archive
+        working-directory: ${{ env.INSTALL_PREFIX }}
+        run: tar -zcvf ${{ env.OPENSSL_ARTIFACT_PATH }} .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: openssl-arm
-          path: ${{ env.PREFIX }}
+          path: ${{ env.OPENSSL_ARTIFACT_PATH }}
 
       - name: Upload release
         uses: marvinpinto/action-automatic-releases@v1.2.1
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
-          files: ${{ env.PREFIX }}
+          files: ${{ env.OPENSSL_ARTIFACT_PATH }}
