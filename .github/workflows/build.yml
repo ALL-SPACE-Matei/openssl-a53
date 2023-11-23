@@ -42,12 +42,6 @@ jobs:
         working-directory: ${{ env.INSTALL_PREFIX }}
         run: tar -zcvf ${{ env.OPENSSL_ARTIFACT_PATH }} .
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: openssl-arm
-          path: ${{ env.OPENSSL_ARTIFACT_PATH }}
-
       - name: Upload release
         uses: marvinpinto/action-automatic-releases@v1.2.1
         with:
