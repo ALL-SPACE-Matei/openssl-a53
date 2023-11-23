@@ -10,7 +10,7 @@ jobs:
   build:
     env:
       INSTALL_PREFIX: /tmp/openssl
-      OPENSLL_ARTIFACT_PATH: /openssl.tar.xz
+      OPENSSL_ARTIFACT_PATH: /openssl.tar.xz
     permissions: write-all
     runs-on: ubuntu-latest
     container: ghcr.io/all-space-matei/cmake-build
