@@ -1,0 +1,45 @@
+name: build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    env:
+      PREFIX: /tmp/openssl
+    permissions: write-all
+    runs-on: ubuntu-latest
+    container: all-space-matei/cmake-build
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: openssl/openssl
+          ref: OpenSSL_1_1_1o
+
+      - name: Configure
+        run: >-
+            ./Configure linux-aarch64
+            threads
+            --cross-compile-prefix=/usr/local/tools/ARM/a53/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-
+            --prefix=${{ env.PREFIX }}
+            --openssldir=/usr/local/lib/ARM/a53/openssl
+
+      - name: Build
+        run: make -j $(nproc)
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: openssl-arm
+          path: ${{ env.PREFIX }}
+
+      - name: Upload release
+        uses: marvinpinto/action-automatic-releases@v1.2.1
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          files: ${{ env.PREFIX }}
