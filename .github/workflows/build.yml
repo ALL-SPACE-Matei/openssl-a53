@@ -12,7 +12,7 @@ jobs:
       PREFIX: /tmp/openssl
     permissions: write-all
     runs-on: ubuntu-latest
-    container: all-space-matei/cmake-build
+    container: ghcr.io/all-space-matei/cmake-build
 
     steps:
       - uses: actions/checkout@v4
