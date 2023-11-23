@@ -33,7 +33,7 @@ jobs:
           OPENSSLDIR: /usr/local/lib/ARM/a53/openssl
 
       - name: Build
-        run: make -j $(nproc)
+        run: make -j $(nproc) --quiet
 
       - name: Install
         run: make install_sw # 'install_sw' doesn't include doc, unlike 'install'
